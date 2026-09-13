@@ -8,6 +8,7 @@ const championName = document.querySelector('#champion-name');
 const championPortrait = document.querySelector('#champion-portrait');
 const sourceLink = document.querySelector('#source-link');
 const themeToggle = document.querySelector('#theme-toggle');
+const searchShortcut = document.querySelector('#search-shortcut');
 let currentSlug = location.hash.slice(1) || 'gangplank';
 if (!data.champions[currentSlug]) currentSlug = data.champions.gangplank ? 'gangplank' : Object.keys(data.champions)[0];
 let current = data.champions[currentSlug];
@@ -81,13 +82,15 @@ function render() {
 
 document.querySelectorAll('.sort').forEach((button) => button.addEventListener('click', () => { state.sort = button.dataset.sort; document.querySelectorAll('.sort').forEach((sort) => sort.classList.toggle('is-active', sort === button)); render(); }));
 searchInput.addEventListener('input', (event) => { state.query = event.target.value.trim().toLowerCase(); render(); });
-window.addEventListener('keydown', (event) => {
-  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') {
-    event.preventDefault();
-    searchInput.focus();
-    searchInput.select();
-  }
-});
+function focusSearchShortcut(event) {
+  if (!(event.metaKey || event.ctrlKey) || event.code !== 'KeyF') return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  searchInput.focus({ preventScroll: true });
+  searchInput.select();
+}
+window.addEventListener('keydown', focusSearchShortcut, { capture: true });
+searchShortcut.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘F' : 'Ctrl F';
 setTheme(localStorage.getItem('aram-theme') === 'light');
 requestAnimationFrame(() => document.body.classList.add('theme-ready'));
 themeToggle.addEventListener('change', () => {
