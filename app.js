@@ -1,5 +1,5 @@
 const catalogData = window.ARAM_CATALOG;
-const championRecords = window.ARAM_CHAMPIONS || {};
+const championRecords = window.ARAM_CHAMPIONS = window.ARAM_CHAMPIONS || {};
 const params = new URLSearchParams(location.search);
 const state = { sort: params.get('sort') === 'win' ? 'win' : 'pick', query: params.get('augment') || '', topOnly: params.get('top') === '1', compact: params.get('density') === 'compact' };
 const content = document.querySelector('#content');
