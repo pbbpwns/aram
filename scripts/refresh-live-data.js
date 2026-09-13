@@ -80,14 +80,26 @@ async function fetchChampion(slug, name) {
 
 function slugFor(name) { return aliases[name] || name.toLowerCase().replace(/&/g, 'and').replace(/['.]/g, '').replace(/\s+/g, '-'); }
 
-function previousCatalog() {
+function parseJsonFile(file) {
   try {
-    const contents = fs.readFileSync(path.join(__dirname, '..', 'data', 'live.js'), 'utf8');
-    const json = contents.slice(contents.indexOf('=') + 1).replace(/;\s*$/, '');
+    const contents = fs.readFileSync(file, 'utf8');
+    const json = contents.slice(contents.lastIndexOf('=') + 1).replace(/;\s*$/, '');
     return JSON.parse(json);
   } catch {
-    return { champions: {} };
+    return null;
   }
+}
+
+function previousSnapshot() {
+  const legacy = parseJsonFile(path.join(__dirname, '..', 'data', 'live.js'));
+  if (legacy) return legacy;
+  const catalogData = parseJsonFile(path.join(__dirname, '..', 'data', 'catalog.js'));
+  const champions = {};
+  for (const entry of catalogData?.catalog || []) {
+    const record = parseJsonFile(path.join(__dirname, '..', 'data', 'champions', `${entry.slug}.js`));
+    if (record) champions[entry.slug] = record;
+  }
+  return { generatedAt: catalogData?.generatedAt, catalog: catalogData?.catalog || [], champions };
 }
 
 async function championCatalog() {
@@ -117,9 +129,20 @@ async function main() {
   const catalog = allChampions ? await championCatalog() : [{ name: requestedSlug[0].toUpperCase() + requestedSlug.slice(1), slug: requestedSlug }];
   const records = await mapWithConcurrency(catalog, allChampions ? 2 : 1, ({ slug, name }) => fetchChampion(slug, name));
   if (records.length === 0) throw new Error('No champion data was fetched; preserving the previous catalog.');
-  const champions = { ...(allChampions ? previousCatalog().champions : {}), ...Object.fromEntries(records.map((record) => [slugFor(record.name), record])) };
-  const output = { generatedAt: new Date().toISOString(), champions, catalog: catalog.filter(({ slug }) => champions[slug]) };
-  fs.writeFileSync(path.join(__dirname, '..', 'data', 'live.js'), `window.ARAM_DATA = ${JSON.stringify(output)};\n`);
+  const previous = previousSnapshot();
+  const champions = { ...previous.champions, ...Object.fromEntries(records.map((record) => [slugFor(record.name), record])) };
+  const outputCatalog = allChampions
+    ? catalog.filter(({ slug }) => champions[slug])
+    : [...(previous.catalog || []).filter(({ slug }) => slug !== catalog[0].slug), ...catalog].filter(({ slug }) => champions[slug]);
+  const dataDirectory = path.join(__dirname, '..', 'data');
+  const championDirectory = path.join(dataDirectory, 'champions');
+  fs.mkdirSync(championDirectory, { recursive: true });
+  for (const [slug, record] of Object.entries(champions)) {
+    fs.writeFileSync(path.join(championDirectory, `${slug}.js`), `window.ARAM_CHAMPIONS = window.ARAM_CHAMPIONS || {}; window.ARAM_CHAMPIONS[${JSON.stringify(slug)}] = ${JSON.stringify(record)};\n`);
+  }
+  fs.writeFileSync(path.join(dataDirectory, 'catalog.js'), `window.ARAM_CATALOG = ${JSON.stringify({ generatedAt: new Date().toISOString(), catalog: outputCatalog })};\n`);
+  const legacyFile = path.join(dataDirectory, 'live.js');
+  if (fs.existsSync(legacyFile)) fs.unlinkSync(legacyFile);
   console.log(`Updated ${records.length}/${catalog.length} champions.`);
 }
 

@@ -22,6 +22,7 @@
 
       <section class="command-bar" aria-label="Champion and augment controls">
         <label class="champion-select"><span>Champion</span><select id="champion"></select></label>
+        <label class="champion-search"><span>Find champion</span><input id="champion-search" type="search" placeholder="Search champions" /></label>
         <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Filter this list (augments)" /><kbd id="search-shortcut">⌘F</kbd></label>
         <div class="sort-control" aria-label="Augment sort order">
           <button class="sort is-active" data-sort="pick">Pick rate</button>
@@ -33,12 +34,18 @@
           <span>Light</span>
         </label>
       </section>
+      <div id="recent-champions" class="recent-champions" aria-label="Recently viewed champions"></div>
+      <div class="view-controls">
+        <label class="check-control"><input id="top-toggle" type="checkbox" /><span>Top recommendations only</span></label>
+        <label class="check-control"><input id="density-toggle" type="checkbox" /><span>Compact spacing</span></label>
+      </div>
 
       <section id="quick-read" class="quick-read" aria-label="Recommended read"></section>
+      <div class="data-status" aria-live="polite"><span id="status-badge" class="status-badge">Live</span><span id="updated-at">Updated recently</span></div>
       <section id="content" class="content" aria-live="polite"></section>
     </main>
     <template id="empty-state"><div class="empty-state">No matching recommendations in this snapshot.</div></template>
-    <script src="data/live.js"></script>
+    <script src="data/catalog.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
