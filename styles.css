@@ -9,7 +9,7 @@ button { cursor: pointer; }
 .eyebrow, .quick-label, .list-heading { color: #a8a89f; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
 .hero-line { display: flex; align-items: end; justify-content: space-between; gap: 24px; }.header-meta { display: flex; align-items: center; gap: 14px; }
 h1 { margin: 9px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(42px, 8vw, 70px); font-weight: 500; line-height: .96; letter-spacing: 0; }
-.champion-title { display: flex; align-items: center; gap: 14px; }.champion-portrait { width: 64px; height: 64px; border: 1px solid #60625e; border-radius: 50%; object-fit: cover; background: #252826; color-scheme: dark; filter: none; }
+.champion-title { display: flex; align-items: center; gap: 14px; }.champion-portrait { width: 64px; height: 64px; border: 1px solid #60625e; border-radius: 4px; object-fit: cover; background: #191b1c; color-scheme: dark; filter: none; }
 .hero p { margin: 0; color: #cac7be; font-size: 15px; }
 .source-link { color: #e6c77a; font-size: 13px; text-decoration: none; white-space: nowrap; }.home-link { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #4a4d49; border-radius: 4px; color: #cac7be; padding: 6px 9px; font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; }.home-link:hover, .home-link:focus-visible { border-color: #e7bf55; color: #f6f2e9; outline: 0; }
 body.is-light .home-link { border-color: #aaa69b; color: #5d5e56; } body.is-light .home-link:hover, body.is-light .home-link:focus-visible { border-color: #c9921b; color: #20231f; }
