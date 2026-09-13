@@ -74,7 +74,7 @@ searchInput.addEventListener('input', (event) => { state.query = event.target.va
 topToggle.addEventListener('change', () => { state.topOnly = topToggle.checked; syncUrl(); if (current) render(); });
 densityToggle.addEventListener('change', () => { state.compact = densityToggle.checked; syncUrl(); if (current) render(); });
 content.addEventListener('click', (event) => { const button = event.target.closest('.collapse-toggle'); if (!button) return; const sectionElement = button.closest('.data-section'); const collapsed = sectionElement.classList.toggle('is-collapsed'); button.setAttribute('aria-expanded', String(!collapsed)); button.textContent = collapsed ? '+' : '−'; });
-function focusSearchShortcut(event) { if (!(event.metaKey || event.ctrlKey) || event.code !== 'KeyF') return; event.preventDefault(); event.stopImmediatePropagation(); searchInput.focus({ preventScroll: true }); searchInput.select(); }
+function focusSearchShortcut(event) { if (!(event.metaKey || event.ctrlKey) || event.code !== 'KeyF') return; const target = event.shiftKey ? championSearch : searchInput; event.preventDefault(); event.stopImmediatePropagation(); target.focus({ preventScroll: true }); target.select(); }
 window.addEventListener('keydown', focusSearchShortcut, { capture: true });
 searchShortcut.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘F' : 'Ctrl F';
 const urlTheme = params.get('theme');
