@@ -5,8 +5,11 @@ const state = { sort: params.get('sort') === 'win' ? 'win' : 'pick', query: para
 const content = document.querySelector('#content');
 const quickRead = document.querySelector('#quick-read');
 const searchInput = document.querySelector('#search');
-const championSelect = document.querySelector('#champion');
 const championSearch = document.querySelector('#champion-search');
+const championPickerToggle = document.querySelector('#champion-picker-toggle');
+const selectedChampionLabel = document.querySelector('#selected-champion-label');
+const championPicker = document.querySelector('#champion-picker');
+const championGrid = document.querySelector('#champion-grid');
 const recentChampions = document.querySelector('#recent-champions');
 const championName = document.querySelector('#champion-name');
 const championPortrait = document.querySelector('#champion-portrait');
@@ -22,6 +25,7 @@ let currentSlug = params.get('champion') || location.hash.slice(1) || 'gangplank
 if (!catalogData.catalog.some((entry) => entry.slug === currentSlug)) currentSlug = catalogData.catalog[0]?.slug;
 let current = null;
 let loadSequence = 0;
+let championPickerOpen = false;
 
 function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character])); }
 function percentage(value) { return `${Number(value).toFixed(1)}%`; }
@@ -52,11 +56,15 @@ function loadChampion(slug) { if (championRecords[slug]) return Promise.resolve(
 function recentList() { try { return JSON.parse(localStorage.getItem('aram-recent') || '[]'); } catch { return []; } }
 function saveRecent(slug) { const next = [slug, ...recentList().filter((entry) => entry !== slug)].slice(0, 5); localStorage.setItem('aram-recent', JSON.stringify(next)); renderRecent(); }
 function renderRecent() { const entries = recentList().map((slug) => catalogData.catalog.find((entry) => entry.slug === slug)).filter(Boolean); recentChampions.innerHTML = entries.length ? `<span class="recent-label">Recent</span>${entries.map((entry) => `<button class="recent-champion" type="button" data-slug="${entry.slug}" title="${escapeHtml(entry.name)}">${iconMarkup(entry.name, championPortraitSrc(entry.name))}<span>${escapeHtml(entry.name)}</span></button>`).join('')}` : ''; }
-function renderChampionOptions(query = '') { const matches = catalogData.catalog.filter((entry) => entry.name.toLowerCase().includes(query.trim().toLowerCase())); championSelect.innerHTML = matches.map((entry) => `<option value="${entry.slug}" ${entry.slug === currentSlug ? 'selected' : ''}>${escapeHtml(entry.name)}</option>`).join(''); }
-async function selectChampion(slug) { if (!catalogData.catalog.some((entry) => entry.slug === slug)) return; currentSlug = slug; syncUrl(); championSelect.value = slug; const entry = catalogData.catalog.find((item) => item.slug === slug); championName.textContent = entry.name; championPortrait.src = championPortraitSrc(entry.name); championPortrait.alt = `${entry.name} portrait`; sourceLink.href = `https://op.gg/lol/modes/aram-mayhem/${slug}/augments`; document.title = `${entry.name} ARAM: Mayhem Desk`; renderLoading(); const request = ++loadSequence; try { current = await loadChampion(slug); if (request !== loadSequence) return; saveRecent(slug); render(); } catch { if (request === loadSequence) renderError(); } }
+function setChampionPickerOpen(isOpen) { championPickerOpen = isOpen; championPicker.hidden = !isOpen; championPickerToggle.setAttribute('aria-expanded', String(isOpen)); }
+function championOptionMarkup(entry) { const selected = entry.slug === currentSlug; return `<button class="champion-option${selected ? ' is-selected' : ''}" type="button" data-slug="${entry.slug}" aria-pressed="${selected}" title="${escapeHtml(entry.name)}">${iconMarkup(entry.name, championPortraitSrc(entry.name))}<span>${escapeHtml(entry.name)}</span></button>`; }
+function renderChampionGrid(query = '') { const normalizedQuery = query.trim().toLowerCase(); const matches = catalogData.catalog.filter((entry) => entry.name.toLowerCase().includes(normalizedQuery)); championGrid.innerHTML = matches.map(championOptionMarkup).join('') || '<p class="champion-empty">No champions found.</p>'; }
+async function selectChampion(slug) { const entry = catalogData.catalog.find((item) => item.slug === slug); if (!entry) return; currentSlug = slug; selectedChampionLabel.textContent = entry.name; renderChampionGrid(championSearch.value); setChampionPickerOpen(false); syncUrl(); championName.textContent = entry.name; championPortrait.src = championPortraitSrc(entry.name); championPortrait.alt = `${entry.name} portrait`; sourceLink.href = `https://op.gg/lol/modes/aram-mayhem/${slug}/augments`; document.title = `${entry.name} ARAM: Mayhem Desk`; renderLoading(); const request = ++loadSequence; try { current = await loadChampion(slug); if (request !== loadSequence) return; saveRecent(slug); render(); } catch { if (request === loadSequence) renderError(); } }
 
-championSearch.addEventListener('input', () => renderChampionOptions(championSearch.value));
-championSelect.addEventListener('change', () => selectChampion(championSelect.value));
+championPickerToggle.addEventListener('click', () => setChampionPickerOpen(!championPickerOpen));
+championSearch.addEventListener('input', () => { renderChampionGrid(championSearch.value); setChampionPickerOpen(true); });
+championSearch.addEventListener('keydown', (event) => { if (event.key === 'Escape') setChampionPickerOpen(false); });
+championGrid.addEventListener('click', (event) => { const button = event.target.closest('[data-slug]'); if (button) selectChampion(button.dataset.slug); });
 recentChampions.addEventListener('click', (event) => { const button = event.target.closest('[data-slug]'); if (button) selectChampion(button.dataset.slug); });
 document.querySelectorAll('.sort').forEach((button) => button.addEventListener('click', () => { state.sort = button.dataset.sort; document.querySelectorAll('.sort').forEach((sort) => sort.classList.toggle('is-active', sort === button)); syncUrl(); if (current) render(); }));
 searchInput.addEventListener('input', (event) => { state.query = event.target.value.trim().toLowerCase(); syncUrl(); if (current) render(); });
@@ -70,7 +78,7 @@ const urlTheme = params.get('theme');
 setTheme(urlTheme ? urlTheme === 'light' : localStorage.getItem('aram-theme') === 'light');
 themeToggle.addEventListener('change', () => { setTheme(themeToggle.checked); localStorage.setItem('aram-theme', themeToggle.checked ? 'light' : 'dark'); syncUrl(); });
 requestAnimationFrame(() => document.body.classList.add('theme-ready'));
-renderChampionOptions();
+renderChampionGrid();
 renderRecent();
 searchInput.value = state.query;
 selectChampion(currentSlug);
