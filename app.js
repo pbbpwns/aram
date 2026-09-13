@@ -16,6 +16,7 @@ const championPortrait = document.querySelector('#champion-portrait');
 const sourceLink = document.querySelector('#source-link');
 const themeToggle = document.querySelector('#theme-toggle');
 const searchShortcut = document.querySelector('#search-shortcut');
+const championSearchShortcut = document.querySelector('#champion-search-shortcut');
 const statusBadge = document.querySelector('#status-badge');
 const updatedAt = document.querySelector('#updated-at');
 const topToggle = document.querySelector('#top-toggle');
@@ -77,6 +78,7 @@ content.addEventListener('click', (event) => { const button = event.target.close
 function focusSearchShortcut(event) { if (!(event.metaKey || event.ctrlKey) || event.code !== 'KeyF') return; const target = event.shiftKey ? championSearch : searchInput; event.preventDefault(); event.stopImmediatePropagation(); target.focus({ preventScroll: true }); target.select(); }
 window.addEventListener('keydown', focusSearchShortcut, { capture: true });
 searchShortcut.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘F' : 'Ctrl F';
+championSearchShortcut.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘+Shift+F' : 'Ctrl+Shift+F';
 const urlTheme = params.get('theme');
 setTheme(urlTheme ? urlTheme === 'light' : localStorage.getItem('aram-theme') === 'light');
 themeToggle.addEventListener('change', () => { setTheme(themeToggle.checked); localStorage.setItem('aram-theme', themeToggle.checked ? 'light' : 'dark'); syncUrl(); });
