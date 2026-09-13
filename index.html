@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111315" />
     <title>ARAM: Mayhem Desk</title>
+    <style>html.app-preload body { visibility: hidden; } html.preload-light, html.preload-light body { background: #f4f1e8; }</style>
+    <script>
+      document.documentElement.classList.add('app-preload');
+      try {
+        const earlyParams = new URLSearchParams(location.search);
+        const earlyTheme = earlyParams.get('theme') || localStorage.getItem('aram-theme');
+        if (earlyTheme === 'light') document.documentElement.classList.add('preload-light');
+      } catch {}
+    </script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
