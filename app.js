@@ -81,6 +81,13 @@ function render() {
 
 document.querySelectorAll('.sort').forEach((button) => button.addEventListener('click', () => { state.sort = button.dataset.sort; document.querySelectorAll('.sort').forEach((sort) => sort.classList.toggle('is-active', sort === button)); render(); }));
 searchInput.addEventListener('input', (event) => { state.query = event.target.value.trim().toLowerCase(); render(); });
+window.addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') {
+    event.preventDefault();
+    searchInput.focus();
+    searchInput.select();
+  }
+});
 setTheme(localStorage.getItem('aram-theme') === 'light');
 requestAnimationFrame(() => document.body.classList.add('theme-ready'));
 themeToggle.addEventListener('change', () => {
