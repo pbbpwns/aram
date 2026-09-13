@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111315" />
+    <title>ARAM: Mayhem Desk</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="eyebrow">ARAM: MAYHEM / LIVE OP.GG DATA</div>
+        <div class="hero-line">
+          <div>
+            <div class="champion-title"><img id="champion-portrait" class="champion-portrait" src="https://opgg-static.akamaized.net/meta/images/lol/latest/champion/Gangplank.png?image=q_auto:good,f_png,w_96,h_96&v=1618" alt="" /><h1 id="champion-name">Gangplank</h1></div>
+            <p>One screen for the data that matters once the shop opens.</p>
+          </div>
+          <a id="source-link" class="source-link" href="https://op.gg/lol/modes/aram-mayhem/gangplank/augments" target="_blank" rel="noreferrer">OP.GG source <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+
+      <section class="command-bar" aria-label="Champion and augment controls">
+        <label class="champion-select"><span>Champion</span><select id="champion"></select></label>
+        <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Filter this list (augments)" /></label>
+        <div class="sort-control" aria-label="Augment sort order">
+          <button class="sort is-active" data-sort="pick">Pick rate</button>
+          <button class="sort" data-sort="win">Win rate</button>
+        </div>
+        <label class="theme-toggle" title="Use light mode">
+          <input id="theme-toggle" type="checkbox" />
+          <span class="theme-track" aria-hidden="true"><span class="theme-thumb"></span></span>
+          <span>Light</span>
+        </label>
+      </section>
+
+      <section id="quick-read" class="quick-read" aria-label="Recommended read"></section>
+      <section id="content" class="content" aria-live="polite"></section>
+    </main>
+    <template id="empty-state"><div class="empty-state">No matching recommendations in this snapshot.</div></template>
+    <script src="data/live.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "aram-mayhem-gangplank",
+  "private": true,
+  "scripts": {
+    "refresh": "node scripts/refresh-live-data.js",
+    "serve": "npx serve ."
+  }
+}
